@@ -1,0 +1,5 @@
+{
+   "watch": ["src", "index.ts"],
+   "ext": ".ts,.js,.yaml",
+   "exec": "npx ts-node -r dotenv/config ./index.ts"
+}

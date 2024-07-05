@@ -1,0 +1,384 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  description: API documentation for user authentication
+  version: 1.0.0
+paths:
+  /api/auth/registration:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '200':
+          description: Verification code sent to your email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          description: Validation error
+        '409':
+          description: User already exists
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected error
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Log in with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful. Access token will be provided in the response body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid email or password
+        '401':
+          description: Incorrect password
+        '403':
+          description: Forbidden
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected error
+
+  /api/auth/activateEmail:
+    post:
+      tags:
+        - Authentication
+      summary: Activate a user's email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateEmailRequest'
+      responses:
+        '201':
+          description: Email activated
+        '401':
+          description: Conflict error (invalid/expired token)
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected error
+
+  /api/auth/resendAccountActivationCode:
+    post:
+      tags:
+        - Authentication
+      summary: Resend account activation code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendActivationCodeRequest'
+      responses:
+        '200':
+          description: Activation code resent to your email
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected error
+
+  /api/auth/refreshAccessToken:  
+    get:
+      tags:
+        - Authentication
+      summary: Refresh access token using refresh Token
+      parameters:
+        - in: cookie
+          name: refreshToken
+          required: false
+          schema:
+            type: string
+          description: Refresh token obtained during login (for web clients)
+        - in: query
+          name: refreshToken
+          required: false
+          schema:
+            type: string
+          description: Refresh token obtained during login (for mobile clients)
+      responses:
+        '200':
+          description: New access token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+        '400':
+          description: Refresh token is required
+        '401':
+          description: Invalid refresh token
+        '409':
+          description: Token expired
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+  paths:
+  /api/auth/logout:
+    get:
+      tags:
+        - Authentication
+      summary: Log out the current user with access token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+        '401':
+          description: Not authorized
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+  /api/auth/forgotPassword:
+    post:
+      tags:
+        - Authentication
+      summary: Forgot password API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Token sent to your email
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+  /api/auth/resetPassword:
+    patch:
+      tags:
+        - Authentication
+      summary: Reset password API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password has been successfully changed
+        '401':
+          description: Invalid token
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+  /api/auth/changePassword:
+    patch:
+      tags:
+        - Authentication
+      summary: Change password API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Password has successfully changed
+        '401':
+          description: Incorrect password
+        '404':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+components:
+  schemas:
+    RegistrationRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+        - phone
+        - birthDate
+      properties:
+        email:
+          type: string
+          example: "arman.mikoyan1@gmail.com"
+        password:
+          type: string
+          example: "Arman111"
+        firstName:
+          type: string
+          example: "Arman"
+        lastName:
+          type: string
+          example: "Mikoyan"
+        phone:
+          type: string
+          example: "099999999"
+        birthDate:
+          type: string
+          format: date
+          example: "05 08 2001"
+
+    RegistrationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Verification code sent to your email
+        email:
+          type: string
+          example: user@example.com
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: arman.mikoyan1@gmail.com
+        password:
+          type: string
+          example: Arman111
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        refreshToken:
+          type: string
+          example: dGhpc2lzYXJlZnJlc2h0b2tlbg==
+        userInfo:
+          $ref: '#/components/schemas/UserInfo'
+
+    ActivateEmailRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: '123456'
+
+    ResendActivationCodeRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          example: arman.mikoyan1@gmail.com
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: dGhpc2lzYXJlZnJlc2h0b2tlbg==
+
+    RefreshTokenResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: New access token generated successfully
+        newAccessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          example: arman.mikoyan1@gmail.com
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - sendedToken 
+        - newPassword
+      properties:
+        sendedToken:
+          type: string
+          example: '123456'
+        newPassword:
+          type: string
+          example: newpassword123
+
+    ChangePasswordRequest:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+      properties:
+        oldPassword:
+          type: string
+          example: currentpassword123
+        newPassword:
+          type: string
+          example: newpassword123
+
+    UserInfo:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "1234567890"
+        email:
+          type: string
+          example: "arman.mikoyan1@gmail.com"
+        firstName:
+          type: string
+          example: "Arman"
+        lastName:
+          type: string
+          example: "Mikoyan"
+        phone:
+          type: string
+          example: "099999999"
+        birthDate:
+          type: string
+          format: date
+          example: "2001-08-05"

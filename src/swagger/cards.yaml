@@ -1,0 +1,201 @@
+openapi: 3.0.0
+info:
+  title: Cards API Documentation
+  description: Endpoints related to user card management
+  version: 1.0.0
+
+tags:
+  - name: Cards
+    description: Endpoints related to user card management
+
+paths:
+  /api/cards/createCard:
+    post:
+      tags:
+        - Cards
+      summary: Create a new card
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardRequest'
+      responses:
+        '201':
+          description: Successfully created card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCardResponse'
+        '401':
+          description: Unauthorized request
+        '404':
+          description: Account or User not found
+        '409':
+          description: Account already attached to another card
+        '500':
+          description: Internal server error
+
+  /api/cards/changeCardName/{id}:
+    patch:
+      tags:
+        - Cards
+      summary: Change the name of a card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the card to change the name for
+        - in: query
+          name: newCardName
+          required: true
+          schema:
+            type: string
+          description: The new name for the card
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeCardNameRequest'
+      responses:
+        '201':
+          description: Card name updated successfully
+        '404':
+          description: User not found / Card is not found
+        '409':
+          description: Incorrect pin
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+  /api/cards/deleteCard/{id}:
+    delete:
+      tags:
+        - Cards
+      summary: Delete a card
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the card to delete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteCardRequest'
+      responses:
+        '201':
+          description: Card deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteCardResponse'
+        '401':
+          description: Unauthorized request
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+components:
+  schemas:
+    CreateCardRequest:
+      type: object
+      properties:
+        pin:
+          type: string
+        cardType:
+          type: string
+        cardName:
+          type: string
+        currency:
+          type: string
+        accountId:
+          type: string
+  
+
+    CreateCardResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Card created successfully
+        card:
+          type: object
+          properties:
+            userId:
+              type: string
+              example: 667c2377bae36c47d9806b25
+            cardNumber:
+              type: string
+              example: 7648951913473405
+            cardHolderName:
+              type: string
+              example: Arman Mikoyan
+            expirationDate:
+              type: string
+              example: Sat Jun 26 2027 18:50:43 GMT+0400 (Armenia Standard Time)
+            cvv:
+              type: string
+              example: $2b$10$wlgxRtU9NX9Dnuan.mW0COXFtgq12KQcRYV1E1BRuueRRtLEfP2Je
+            pin:
+              type: string
+              example: $2b$10$ybo0DRX4UEnIRa1FPEgXluoR0eJmWur/qPbV6KLU8wxIHEFY7KoVO
+            cardType:
+              type: string
+              example: Visa
+            cardName:
+              type: string
+              example: string
+            balance:
+              type: number
+              example: 0
+            currency:
+              type: string
+              example: AMD
+            _id:
+              type: string
+              example: 667c2ac3b951057ce625e982
+            __v:
+              type: number
+              example: 0
+
+    ChangeCardNameRequest:
+      type: object
+      required:
+        - pin
+      properties:
+        pin:
+          type: string
+          example: '1234'
+      description: The PIN to authorize the change
+
+    DeleteCardRequest:
+      type: object
+      required:
+        - pin 
+      properties:
+        pin:
+          type: string
+          example: '1234'
+      description: The PIN to authorize the deletion
+
+    DeleteCardResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Card deleted successfully

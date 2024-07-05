@@ -1,0 +1,174 @@
+openapi: 3.0.0
+info:
+  title: Accounts API Documentation
+  description: Endpoints related to Accounts management
+  version: 1.0.0
+
+tags:
+  - name: Accounts
+    description: Endpoints related to Accounts management
+
+paths:
+  /api/accounts/createAccount:
+    post:
+      tags:
+        - Accounts
+      summary: Create a new account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Successfully created account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountResponse'
+        '409':
+          description: Incorrect password
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+  /api/accounts/changeAccountName/{id}:
+    patch:
+      tags:
+        - Accounts
+      summary: Change the name of an Account
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the Account to change the name for
+        - in: query
+          name: newAccountName
+          required: true
+          schema:
+            type: string
+          description: The new name for the Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeAccountNameRequest'
+      responses:
+        '201':
+          description: Account name updated successfully
+        '404':
+          description: User not found / Account is not found
+        '409':
+          description: Incorrect password
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+  /api/accounts/deleteAccount/{id}:
+    delete:
+      tags:
+        - Accounts
+      summary: Delete an account
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the account to delete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAccountRequest'
+      responses:
+        '201':
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAccountResponse'
+        '404':
+          description: Unauthorized request
+        '401':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
+components:
+  schemas:
+    CreateAccountRequest:
+      type: object
+      properties:
+        currency:
+          type: string
+          example: USD
+        accountType:
+          type: string
+          example: Current
+
+    CreateAccountResponse:
+      type: object
+      properties:
+        account:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: 667c2377bae36c47d9806b25
+            userId:
+              type: string
+              example: 667c2377bae36c47d9806b25
+            accountNumber:
+              type: string
+              example: 7648951913473405
+            balance:
+              type: number
+              format: float
+              example: 0
+            currency:
+              type: string
+              example: USD
+            accountType:
+              type: string
+              example: Current
+
+    ChangeAccountNameRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+          example: '1234'
+      description: The Password to authorize the change
+
+    DeleteAccountRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+          example: 'user password'
+      description: The Password to authorize the deletion
+
+    DeleteAccountResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Account deleted successfully

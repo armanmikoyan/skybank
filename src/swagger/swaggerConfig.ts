@@ -14,6 +14,9 @@ const options = {
         url: `http://localhost:${process.env.PORT || 6666}`,
         description: 'Local server',
       },
+      {
+        url: `${process.env.HOSTING_URL}/api`,
+      }
     ],
     components: {
       securitySchemes: {

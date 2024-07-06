@@ -14,12 +14,13 @@ mongoDbStart();
 
 const app = express();
 
+
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors(corsOptions));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
-
 app.use("/api/auth", authRouter);
 app.use("/api/cards", cardsRouter);
 app.use("/api/accounts", accountsRouter);

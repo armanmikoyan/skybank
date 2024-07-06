@@ -5,12 +5,12 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api-docs/**",
+        "destination": "/api-docs/index.html"
+      }
     ]
-  },
-  "rewrites": [
-    {
-      "source": "/api-docs/**",
-      "function": "app"
-    }
-  ]
+  }
 }

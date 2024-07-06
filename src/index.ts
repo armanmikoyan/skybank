@@ -1,13 +1,13 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import swaggerSpecs from "./src/swagger/swaggerConfig";
+import swaggerSpecs from "./swagger/swaggerConfig";
 import swaggerUi from "swagger-ui-express";
-import { corsOptions } from "./src/utils/corsConfig"; 
-import { authRouter } from "./src/routes/authRouter";
-import { cardsRouter } from "./src/routes/cardsRouter";
-import { accountsRouter } from "./src/routes/accountsRouter";
-import { mongoDbStart } from "./src/dataBase/mongo";
+import { corsOptions } from "./utils/corsConfig"; 
+import { authRouter } from "./routes/authRouter";
+import { cardsRouter } from "./routes/cardsRouter";
+import { accountsRouter } from "./routes/accountsRouter";
+import { mongoDbStart } from "./dataBase/mongo";
 
 const PORT = process.env.PORT || 6666;
 mongoDbStart();

@@ -8,7 +8,6 @@ import { authRouter } from "./src/routes/authRouter";
 import { cardsRouter } from "./src/routes/cardsRouter";
 import { accountsRouter } from "./src/routes/accountsRouter";
 import { mongoDbStart } from "./src/dataBase/mongo";
-import * as functions from 'firebase-functions';
 
 const PORT = process.env.PORT || 6666;
 mongoDbStart();

@@ -25,10 +25,10 @@ app.use("/api/auth", authRouter);
 app.use("/api/cards", cardsRouter);
 app.use("/api/accounts", accountsRouter);
 
-// app.listen(PORT, () => {
-//    console.log(`Server is running on Port ${PORT}`);
-// });
+app.listen(PORT, () => {
+   console.log(`Server is running on Port ${PORT}`);
+});
 
-export const api = functions.https.onRequest(app);
+
 
 

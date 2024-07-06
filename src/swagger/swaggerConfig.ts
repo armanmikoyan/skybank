@@ -15,7 +15,7 @@ const options = {
         description: 'Local server',
       },
       {
-        url: `${process.env.HOSTING_URL}/api`,
+        url: `${process.env.HOSTING_URL}`,
       }
     ],
     components: {

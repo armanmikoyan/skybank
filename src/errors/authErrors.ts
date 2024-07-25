@@ -6,9 +6,9 @@ export default class AuthError extends Error {
 };
  
 class UserNotFoundError extends AuthError {
-   constructor() {
-     super('User not found');
-     this.name = 'UserNotFoundError';
+   constructor(message?: string) {
+     super(message ?? 'User not found');
+     this.name = message ?? 'UserNotFoundError';
    };
 };
 
@@ -20,8 +20,8 @@ class UserAccountIsNotActivatedError extends AuthError {
 };
 
 class UserAlreadyExistsError extends AuthError {
-   constructor() {
-     super('User already exists');
+   constructor(message: any) {
+     super(message ?? 'User already exists');
      this.name = 'UserAlreadyExistsError';
    };
 };
@@ -55,9 +55,9 @@ class IncorrectEmailError extends AuthError {
 };
 
 class AccountIsNotFound extends AuthError {
-   constructor() {
-     super('Account is not found');
-     this.name = 'IncorrectAccountId';
+   constructor(message?: string) {
+     super(message ?? 'Account is not found');
+     this.name = "AccountIsNotFound";
    };
 };
 
@@ -69,9 +69,16 @@ class AccountIsBusy extends AuthError {
 };
 
 class CardIsNotFound extends AuthError {
-   constructor() {
-     super('Card is not found');
-     this.name = 'CardIsNotFound';
+   constructor(message?: string) {
+     super(message ?? 'Card is not found');
+     this.name ='CardIsNotFound';
+   };
+};
+
+class IncompatibeError extends AuthError {
+   constructor(message?: string) {
+     super(message ?? 'Card and Account are not compatible');
+     this.name = 'IncompatibeError';
    };
 };
 
@@ -85,6 +92,7 @@ export {
    AccountIsNotFound,
    CardIsNotFound,
    IncorrectPin,
-   AccountIsBusy
+   AccountIsBusy,
+   IncompatibeError
 };
  

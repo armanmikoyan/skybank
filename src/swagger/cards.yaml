@@ -110,6 +110,206 @@ paths:
         '501':
           description: Unexpected server error
 
+  /api/cards/transactions/transfer/card-to-account:
+    post:
+      tags:
+        - Cards
+      summary: Transfer money to  account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferToAccountRequest'
+      responses:
+        '200':
+          description: Transaction completed successfully
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/TransferToAccountResponse'
+        '400':
+          description: Not enough balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The same account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found / Account is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/cards/transactions/transfer/card-to-card:
+    post:
+      tags:
+        - Cards
+      summary: Transfer money to  card
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferToAccountRequest'
+      responses:
+        '200':
+          description: Transaction completed successfully
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/TransferToAccountResponse'
+        '400':
+          description: Not enough balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The same account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found / Account is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/cards/transactions/transfer/viaPhoneNumber:
+    post:
+      tags:
+        - Cards
+      summary: Transfer money via phone number
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferToAccountRequestViaPhone'
+      responses:
+        '200':
+          description: Transaction completed successfully
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/TransferToAccountResponse'
+        '400':
+          description: Not enough balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The same account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found / Account is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/cards:
+    get:
+      tags:
+        - Cards
+      summary: Get cards
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: count
+          schema:
+            default: Infinity
+          description: Number of cards to retrieve
+      responses:
+        '200':
+          description: Successfully retrieved cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/card'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     CreateCardRequest:
@@ -120,8 +320,6 @@ components:
         cardType:
           type: string
         cardName:
-          type: string
-        currency:
           type: string
         accountId:
           type: string
@@ -183,6 +381,31 @@ components:
           example: '1234'
       description: The PIN to authorize the change
 
+    TransferToAccountRequestViaPhone:
+      type: object
+      required:
+        - creditNumber
+        - debitNumber
+        - password
+        - amount
+      properties:
+        creditNumber:
+          type: string
+          example: '123456789012345'
+        debitNumber:
+          type: string
+          example: '099999999'
+        password:
+          type: string
+          example: 'Arman111'
+        amount:
+          type: number
+          format: float
+          example: 100.0
+        notes:
+          type: string
+          example: 'Some notes'
+
     DeleteCardRequest:
       type: object
       required:
@@ -199,3 +422,76 @@ components:
         message:
           type: string
           example: Card deleted successfully
+  
+    TransferToAccountRequest:
+      type: object
+      required:
+        - creditNumber
+        - debitNumber
+        - password
+        - amount
+      properties:
+        creditNumber:
+          type: string
+          example: '123456789012345'
+        debitNumber:
+          type: string
+          example: '6566971968343332'
+        password:
+          type: string
+          example: 'Arman111'
+        amount:
+          type: number
+          format: float
+          example: 100.0
+        notes:
+          type: string
+          example: 'Some notes'
+
+    TransferToAccountResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Transaction completed successfully
+    
+    card:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '60d0fe4f5311236168a109ca'
+        userId:
+          type: string
+          example: "60d0fe4f5311236168a109ca"
+        accountId:
+          type: string
+          example: '60d0fe4f5311236168a109ca'
+        cardNumber:
+          type: string
+          example: '1111111111111111'
+        balance:
+          type: number
+          example: 0
+        currency:
+          type: string
+          example: 'AMD'
+        cardType:
+          type: string
+          example: 'Saving'
+        cardsName:
+          type: string
+          example: 'My current card'
+        hasCard:
+          type: boolean
+          example: 'true'
+        pin:
+          type: number
+          example: 'hashed'
+        cvv:
+          type: number
+          example: 'hashed'
+        expirationDate:
+          type: date
+          example: '09 12 2090'
+

@@ -55,7 +55,6 @@ class AuthService {
     
    async #verificationTokenSender(code: number, email: string, expiresAt: Date, subject: string, htmlContent: string) {   
      try {
-      
          const existingCode = await verificationCodeSchema.findOne({ email });
          if (existingCode) {
             await verificationCodeSchema.findOneAndUpdate({ email }, { code, expiresAt });
@@ -118,8 +117,14 @@ class AuthService {
 
    async registration(user: UserInterface) {
       try {
-         const userAlreadyExists = await userSchema.findOne({ email: user.email });
-         if (userAlreadyExists) throw new UserAlreadyExistsError;
+         const userAlreadyExists = await userSchema.findOne({ 
+            $or: [
+               { email: user.email },
+               { phone: user.phone }
+            ]
+          });
+         if (userAlreadyExists?.email == user.email) throw new UserAlreadyExistsError("User already exists with this email")
+         if (userAlreadyExists?.phone == user.phone) throw new UserAlreadyExistsError("User already exists with this phone")
    
          const hashedPassword = await bcrypt.hash(user.password, 10);
          const newUser = new userSchema({
@@ -198,7 +203,7 @@ class AuthService {
             await refreshTokenSchema.create({ userId: user._id, token: refreshToken, email: user.email, expiresAt });
          }   
   
-         const { password: notInclude, ...userInfo } = user;
+         const { password: notInclude, cards, accounts, transactions,  ...userInfo } = user;
 
          return { accessToken, refreshToken, userInfo };
          

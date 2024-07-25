@@ -1,4 +1,4 @@
-import { Length, IsEmail, IsNotEmpty, IsString, Matches, MinLength, MaxLength } from "class-validator";
+import { Length, IsEmail, IsNotEmpty, IsString, Matches, MinLength, MaxLength, } from "class-validator";
 
 export default class UserRegister {
   @IsString()
@@ -23,9 +23,9 @@ export default class UserRegister {
   phone: string;
 
   @IsString()
-  @Matches(/^(0[1-9]|[12]\d|3[01]) (0[1-9]|1[0-2]) (19|20)\d{2}$/, {
+  @Matches(/^\d{2} \d{2} \d{4}$/, {
      message: 'Date must be in the format "dd mm yy"',
-   })
+  })
    birthDate: string;
 
   @IsNotEmpty()

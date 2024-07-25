@@ -18,6 +18,10 @@ class AuthController {
             birthDate, 
             accounts:[], 
             cards:[],  
+            transactions: {
+               transfers: [],
+               withdraws: [] 
+            },
             isVerified: false,
          });
          res.status(200).json({ message: `Verification code sent to your email`, email});

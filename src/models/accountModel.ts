@@ -1,12 +1,17 @@
 import mongoose, { Schema } from "mongoose";
+import { Currency } from "../interfaces/transactions/transactionInterface";
+import { AccountType } from "../interfaces/accountInterface";
 
 const AccountSchema = new Schema({
    userId: {
       type: String,
       required: true
    },
+   cardId: {
+      type: String, 
+   },
    accountNumber: { 
-      type: String,
+      type: String, 
       required: true,
    },
    balance: { 
@@ -16,12 +21,12 @@ const AccountSchema = new Schema({
    },
    currency: { 
       type: String, 
-      enum: ["AMD", "RUB", "USD", "EUR"],
+      enum: Currency,
       required: true,
    },
    accountType: {
       type: String,
-      enum: ["Current", "Saving"],
+      enum: AccountType,
       required: true,
    },
    accountName: { 
@@ -31,7 +36,7 @@ const AccountSchema = new Schema({
    hasCard: {
       type: Boolean,
       default: false,
-   }
+   },
 })
 
 export default mongoose.model("Account", AccountSchema);

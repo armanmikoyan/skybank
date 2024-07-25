@@ -1,16 +1,5 @@
-import { IsNotEmpty, IsString, IsEnum, Length, Matches, IsMongoId } from 'class-validator';
-
-enum CardType {
-  Visa = 'Visa',
-  Master = 'Master',
-}
-
-enum Currency {
-  AMD = "AMD",
-  RUB = "RUB",
-  USD = "USD",
-  EUR = "EUR",
-}
+import { IsNotEmpty, IsString, IsEnum, Length, Matches, IsMongoId, ValidateIf } from 'class-validator';
+import { CardType } from "../interfaces/cardInterface"
 
 export default class CardValidator {
   @IsNotEmpty()
@@ -21,12 +10,9 @@ export default class CardValidator {
   @IsEnum(CardType, { message: 'cardType must be either "Visa" or "Master"' })
   cardType: CardType;
 
-  @IsNotEmpty()
-  @IsEnum(Currency, { message: 'currency must be AMD, RUB, USD OR EUR' })
-  currency: CardType;
-
-  @IsNotEmpty()
-  @IsMongoId()
+  @IsString()
+  @ValidateIf(o => o.accountId !== undefined && o.accountId !== null && o.accountId !== '')
+  @IsMongoId({ message: 'accountId must be a valid MongoDB ObjectId or empty to create default account' })
   accountId: string;
 
   @IsString()

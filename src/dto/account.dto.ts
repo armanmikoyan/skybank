@@ -1,16 +1,6 @@
 import { IsNotEmpty, IsEnum , IsString , Length } from 'class-validator';
-
-enum Currency {
-   AMD = 'AMD',
-   RUB = 'RUB',
-   USD = 'USD',
-   EUR = 'EUR',
-};
-
-enum AccountType {
-   Current = "Current",
-   Saving = "Saving",
-}
+import { Currency } from '../interfaces/transactions/transactionInterface';
+import { AccountType } from "../interfaces/accountInterface"
 
 export default class AccountValidator {
 
@@ -29,6 +19,8 @@ export class newAccountNameValidator {
    @Length(0, 15, { message: 'Account name can be up to 15 characters long' })
    newAccountName: string & undefined;
  };
+
+
  
 
 

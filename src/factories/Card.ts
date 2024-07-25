@@ -1,4 +1,5 @@
 import CardInterface from "../interfaces/cardInterface"
+import { Currency } from '../interfaces/transactions/transactionInterface';
 
 export default class Card implements CardInterface {
    cardNumber: string;
@@ -9,12 +10,12 @@ export default class Card implements CardInterface {
    pin: string;
    cardType: string;
    cardName: string | undefined;
-   currency: string;
+   currency: Currency;
    accountId: string;
    balance: number;
    
 
-   constructor(userId: string, accountId: string, cardHolderName: string, pin: string, cardType: string, cardName: string | undefined, currency: string) {
+   constructor(userId: string, accountId: string, cardHolderName: string, pin: string, cardType: string, cardName: string | undefined, currency: Currency) {
       this.cardNumber = this.#generateCardNumber();
       this.expirationDate = this.#generateExpirationDate();
       this.cvv = this.#generateCvv();

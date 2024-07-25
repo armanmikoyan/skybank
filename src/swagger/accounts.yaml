@@ -108,6 +108,206 @@ paths:
         '501':
           description: Unexpected server error
 
+  /api/accounts/transactions/transfer/account-to-account:
+    post:
+      tags:
+        - Accounts
+      summary: Transfer money to another account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferToAccountRequest'
+      responses:
+        '200':
+          description: Transaction completed successfully
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/TransferToAccountResponse'
+        '400':
+          description: Not enough balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The same account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found / Account is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+/api/accounts/transactions/transfer/account-to-card:
+    post:
+      tags:
+        - Accounts
+      summary: Transfer money to  card
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferToAccountRequest'
+      responses:
+        '200':
+          description: Transaction completed successfully
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/TransferToAccountResponse'
+        '400':
+          description: Not enough balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The same account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found / Account is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+/api/accounts/transactions/transfer/viaPhoneNumber:
+    post:
+      tags:
+        - Accounts
+      summary: Transfer money via phone number
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferToAccountRequestViaPhone'
+      responses:
+        '200':
+          description: Transaction completed successfully
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/TransferToAccountResponse'
+        '400':
+          description: Not enough balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The same account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found / Account is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+/api/accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Get accounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: count
+          schema:
+            default: Infinity
+          description: Number of accounts to retrieve
+      responses:
+        '200':
+          description: Successfully retrieved accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     CreateAccountRequest:
@@ -172,3 +372,99 @@ components:
         message:
           type: string
           example: Account deleted successfully
+
+    TransferToAccountRequest:
+      type: object
+      required:
+        - creditNumber
+        - debitNumber
+        - password
+        - amount
+      properties:
+        creditNumber:
+          type: string
+          example: '123456789012345'
+        debitNumber:
+          type: string
+          example: '6566971968343332'
+        password:
+          type: string
+          example: 'Arman111'
+        amount:
+          type: number
+          format: float
+          example: 100.0
+        notes:
+          type: string
+          example: 'Some notes'
+          
+    TransferToAccountRequestViaPhone:
+      type: object
+      required:
+        - creditNumber
+        - debitNumber
+        - password
+        - amount
+      properties:
+        creditNumber:
+          type: string
+          example: '123456789012345'
+        debitNumber:
+          type: string
+          example: '099999999'
+        password:
+          type: string
+          example: 'Arman111'
+        amount:
+          type: number
+          format: float
+          example: 100.0
+        notes:
+          type: string
+          example: 'Some notes'
+
+    TransferToAccountResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Transaction completed successfully
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Error message  
+
+    Account:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '60d0fe4f5311236168a109ca'
+        userId:
+          type: string
+          example: "60d0fe4f5311236168a109ca"
+        cardId:
+          type: string
+          example: '60d0fe4f5311236168a109ca'
+        accountNumber:
+          type: string
+          example: '1111111111111111'
+        balance:
+          type: number
+          example: 0
+        currency:
+          type: string
+          example: 'AMD'
+        accountType:
+          type: string
+          example: 'Saving'
+        accountName:
+          type: string
+          example: 'My current account'
+        hasCard:
+          type: boolean
+          example: 'true'
+

@@ -22,9 +22,10 @@ const userSchema: Schema<UserInterface> = new Schema({
    phone: {
       type: String,
       required: true,
+      unique: true,
    },
     birthDate: {
-      type: Date,
+      type: String,
     },
     isVerified: {
       type: Boolean,
@@ -42,6 +43,20 @@ const userSchema: Schema<UserInterface> = new Schema({
         ref: "Card",
       },
    ],
+   transactions: {
+      transfers: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Transfer",
+        },
+      ],
+      withdraws: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Withdraw",
+        },
+      ],
+   }
 })
 
 export default mongoose.model("User", userSchema);

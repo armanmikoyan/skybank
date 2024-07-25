@@ -2,7 +2,6 @@ import { Response, NextFunction } from "express";
 import { validate, ValidationError } from "class-validator";
 
 export class BaseValidator {
-
    async validate(dtoClass: any, reqObject: any , res: Response, next: NextFunction) {
      try {
        const dtoObject = Object.assign(new dtoClass(), reqObject);

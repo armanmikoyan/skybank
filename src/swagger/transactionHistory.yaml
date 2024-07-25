@@ -1,0 +1,157 @@
+openapi: 3.0.0
+info:
+  title: Transactions API Documentation
+  description: Endpoints related to user transaction history
+  version: 1.0.0
+
+tags:
+  - name: Transactions
+    description: Endpoints related to user transaction history
+
+paths:
+  /api/history/transactions/{type}:
+    get:
+      tags:
+        - Transactions
+      summary: Get transaction history
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [transfer, withdraw, deposit, payment]
+          description: Type of transaction to retrieve
+        - in: query
+          name: count
+          schema:
+            type: integer
+          description: Number of transactions to retrieve
+        - in: query
+          name: creditCurrency
+          schema:
+            type: string
+            enum: [ALL, AMD, USD, RUB, EUR]
+            default: ALL
+          description: Filter by credit currency
+        - in: query
+          name: debitCurrency
+          schema:
+            type: string
+            enum: [ALL, AMD, USD, RUB, EUR]
+            default: ALL
+          description: Filter by debit currency
+        - in: query
+          name: creditMaxAmount
+          schema:
+            type: number
+            format: float
+          description: Filter by maximum credit amount
+        - in: query
+          name: creditMinAmount
+          schema:
+            type: number
+            format: float
+          description: Filter by minimum credit amount
+        - in: query
+          name: debitMaxAmount
+          schema:
+            type: number
+            format: float
+          description: Filter by maximum debit amount
+        - in: query
+          name: debitMinAmount
+          schema:
+            type: number
+            format: float
+          description: Filter by minimum debit amount
+        - in: query
+          name: before_date
+          schema:
+            type: string
+            format: date-time
+            example: '2023-07-15'
+          description: Filter transactions before this date yy-mm-dd
+        - in: query
+          name: after_date
+          schema:
+            type: string
+            format: date-time
+            example: '2023-07-15'
+          description: Filter transactions after this date yy-mm-dd
+      responses:
+        '200':
+          description: Successfully retrieved transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Invalid transaction type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '60d0fe4f5311236168a109ca'
+        amount:
+          type: number
+          format: float
+          example: 100.0
+        currency:
+          type: string
+          example: 'USD'
+        date:
+          type: string
+          format: date-time
+          example: '2023-07-15T12:00:00Z'
+        creditNumber:
+          type: string
+          example: '1234567890123456'
+        debitNumber:
+          type: string
+          example: '6543210987654321'
+        creditCurrency:
+          type: string
+          example: 'USD'
+        debitCurrency:
+          type: string
+          example: 'USD'
+        creditAmount:
+          type: number
+          format: float
+          example: 100.0
+        debitAmount:
+          type: number
+          format: float
+          example: 100.0
+        status:
+          type: string
+          example: 'completed'
+        notes:
+          type: string
+          example: 'some notes'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: 'An error occurred'

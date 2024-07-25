@@ -1,17 +1,24 @@
 import cardSchema from "../models/cardModel"
 import userSchema from "../models/userModel";
-import Card from "../class/Card"
+import Card from "../factories/Card"
 import bcrypt from 'bcrypt';
 import InternalServerError from "../errors/internalErrors"
 import accountModel from "../models/accountModel";
-import { CardPayloadFromUserInterface } from "../interfaces/cardInterface"
-import { CardIsNotFound, UserNotFoundError, IncorrectPin } from "../errors/authErrors";
+import cardModel from "../models/cardModel";
+import TransferI from "../interfaces/transactions/transferInterface"
+import { Transfer } from "./transactions/transfer/transferService"
+import CardInterface, { CardPayloadFromUserInterface } from "../interfaces/cardInterface"
+import { CardIsNotFound, UserNotFoundError, IncorrectPin, IncorrectPasswordError } from "../errors/authErrors";
 import { AccountIsNotFound, AccountIsBusy } from "../errors/authErrors";
+import { NotEnoughBalance, TheSameAccountNumber, } from "../errors/transactionErrors";
+import { Currency } from "../interfaces/transactions/transactionInterface"
 
+
+ 
 class CardService {
 
    async createCard(cardPayloadFromUser: CardPayloadFromUserInterface) {
-      const { userId, accountId, cardHolderName, pin, cardType, cardName, currency } = cardPayloadFromUser;   
+      const { userId, accountId, cardHolderName, pin, cardType, cardName } = cardPayloadFromUser;   
       try {
          const user = await userSchema.findById(userId);
          if (!user) throw UserNotFoundError;   
@@ -24,18 +31,21 @@ class CardService {
 
          if (account.hasCard) throw new AccountIsBusy; 
 
+         const currency: Currency = account.currency as Currency;
          const hashedPin = await bcrypt.hash(pin, 10);
          const card = new Card(userId, accountId, cardHolderName, hashedPin, cardType, cardName, currency);  
+         card.balance = account.balance;
          card.cvv = await bcrypt.hash(card.cvv, 10);
          const storedCard = await cardSchema.create(card);
    
          await userSchema.findByIdAndUpdate( 
             userId,
             { $push: { cards: storedCard._id } },
-            { new: true, useFindAndModify: false });
-
-
+            { new: true, useFindAndModify: false 
+         });
+         
          account.hasCard = true;
+         account.cardId = (storedCard._id as any).toString();
          await account.save();
          return storedCard;
 
@@ -88,7 +98,7 @@ class CardService {
                const isCorrectPin = await bcrypt.compare(pin, card.pin as string);
                if (!isCorrectPin) throw new IncorrectPin;
 
-               await accountModel.findByIdAndUpdate(card.accountId, { hasCard: false });
+               await accountModel.findByIdAndUpdate(card.accountId, { hasCard: false, cardId: "" });
                await cardSchema.findByIdAndDelete(cardId);
                return await userSchema.findByIdAndUpdate(
                   { _id: card.userId },
@@ -104,7 +114,109 @@ class CardService {
             throw new InternalServerError(error.message);
          }
       }
-   };
+   }
+
+   async transferToAccount(userId: string, password: string, transferInfo: TransferI) {
+      try {
+         const { creditNumber } = transferInfo;
+         const user = await userSchema.findById(userId);
+         const creditCard = await cardModel.findOne({cardNumber: creditNumber})
+         
+         if (!user) throw new UserNotFoundError;
+         if (!creditCard) throw new CardIsNotFound;
+         if ((creditCard.userId as string).toString() != user._id.toString()) throw new AccountIsNotFound("User doesn't own the Card");
+         
+         const isCorrectPassword = await bcrypt.compare(password, user.password as string);
+         if  (!isCorrectPassword) throw new IncorrectPasswordError;
+   
+         const creditAccount = await accountModel.findById((creditCard.accountId as String).toString());
+         if (!creditAccount) throw new AccountIsNotFound;
+
+         transferInfo.creditNumber = creditAccount.accountNumber;
+
+         const transferMaker = new Transfer(transferInfo);
+         await transferMaker.makeTransaction();
+   
+      } catch (error: any) {
+         if (error instanceof UserNotFoundError || error instanceof AccountIsNotFound || error instanceof IncorrectPasswordError || error instanceof TheSameAccountNumber || error instanceof NotEnoughBalance || error instanceof CardIsNotFound) {
+            throw error;
+         }
+         throw new InternalServerError(error.message);
+      }
+   }
+
+   async transferToCard(userId: string, password: string, transferInfo: TransferI) {
+      try {
+         const { creditNumber } = transferInfo;
+         const user = await userSchema.findById(userId);
+         const creditCard = await cardModel.findOne({cardNumber: creditNumber})
+         
+         if (!user) throw new UserNotFoundError;
+         if (!creditCard) throw new CardIsNotFound;
+         if ((creditCard.userId as string).toString() != user._id.toString()) throw new AccountIsNotFound("User doesn't own the Card");
+   
+         const isCorrectPassword = await bcrypt.compare(password, user.password as string);
+         if  (!isCorrectPassword) throw new IncorrectPasswordError;
+        
+         const creditAccount = await accountModel.findById((creditCard.accountId as String).toString());
+         if (!creditAccount) throw new AccountIsNotFound;
+
+         transferInfo.creditNumber = creditAccount.accountNumber;
+
+         const debitCard = await cardSchema.findOne({cardNumber: transferInfo.debitNumber});
+         if (!debitCard) throw new CardIsNotFound;
+         
+         const debitAccount = await accountModel.findById((debitCard.accountId as String).toString());
+         if (!debitAccount) throw new AccountIsNotFound;
+
+         transferInfo.debitNumber = debitAccount.accountNumber;
+
+         const transferMaker = new Transfer(transferInfo);
+         await transferMaker.makeTransaction();
+   
+      } catch (error: any) {
+         if (error instanceof CardIsNotFound || error instanceof UserNotFoundError || error instanceof AccountIsNotFound || error instanceof IncorrectPasswordError || error instanceof TheSameAccountNumber || error instanceof NotEnoughBalance) {
+            throw error;
+         }
+         throw new InternalServerError(error.message);
+      }
+   }
+
+   async proxyServiceViaPhone(userId: string, password: string, transferInfo: TransferI) {
+      try {
+         const debitUser = await userSchema.findOne({ phone: transferInfo.debitNumber });
+         if (!debitUser) throw new UserNotFoundError("Debit user is not found");
+         const account = await accountModel.findById(debitUser.accounts[0]);
+         if (!account) throw new AccountIsNotFound("debit user doesn't have any account");
+         transferInfo.debitNumber = account.accountNumber as string;
+         await this.transferToAccount(userId, password, transferInfo);
+      } catch(error: any) {
+         if (error instanceof UserNotFoundError || error instanceof AccountIsNotFound || error instanceof IncorrectPasswordError || error instanceof TheSameAccountNumber || error instanceof NotEnoughBalance) {
+            throw error;
+         }
+         throw new InternalServerError(error.message);
+      }
+   }
+
+
+   async getCards(userId: string, count: number) {
+      try {
+         const user = await userSchema.findById(userId);
+         if (!user) throw new UserNotFoundError;
+
+         const cards: CardInterface[] = [];
+         const cardIds = user.cards.slice(0, count);
+
+         for (const cardId of cardIds) {
+            cards.push(await cardModel.findById(cardId) as CardInterface);
+         };
+         
+        return cards;
+
+      } catch(error: any) {
+         throw error;
+      }
+   }
 };
 
 export default new CardService;

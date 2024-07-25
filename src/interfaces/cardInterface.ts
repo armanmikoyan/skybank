@@ -1,7 +1,13 @@
+export enum CardType {
+   Visa = 'Visa',
+   Master = 'Master',
+}
+
 export interface CardPayloadFromSystemInterface {  // It'll be added from system
    cardNumber: string,
    expirationDate: Date,
    cvv: string,
+   currency: string;
 };
 
 export interface CardPayloadFromUserInterface {  // It'll be added from user
@@ -11,7 +17,6 @@ export interface CardPayloadFromUserInterface {  // It'll be added from user
    pin: string,
    cardType: string,
    cardName: string | undefined,
-   currency: string;
 };
 
 

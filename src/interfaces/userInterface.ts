@@ -9,8 +9,12 @@ export interface UserInterface {
    firstName: string,
    lastName: string,
    phone: string,
-   birthDate: Date,
+   isVerified: boolean,
+   birthDate: String,
    accounts: string[],
    cards: string[],
-   isVerified: boolean,
+   transactions: {
+      transfers: string[],
+      withdraws: string[],
+   },
 };

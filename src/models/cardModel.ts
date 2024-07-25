@@ -1,4 +1,6 @@
 import mongoose, { Schema } from "mongoose";
+import { Currency } from "../interfaces/transactions/transactionInterface";
+import { CardType } from "../interfaces/cardInterface";
 
 const CardSchema: Schema = new Schema({
    userId: { 
@@ -33,7 +35,7 @@ const CardSchema: Schema = new Schema({
    },
    cardType: { 
       type: String, 
-      enum: ["Visa", "Master"], 
+      enum: CardType, 
       required: true 
    },
    cardName: { 
@@ -42,14 +44,14 @@ const CardSchema: Schema = new Schema({
    },
    currency: { 
       type: String, 
-      enum: ["AMD", "RUB", "USD", "EUR"],
+      enum: Currency,
       required: true,
    },
    balance: {
       type: Number,
       required: true,
       default: 0,
-   }
+   },
 });
 
 export default mongoose.model("Card", CardSchema);

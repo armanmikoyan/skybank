@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  title: Deposit API Documentation
+  description: Endpoints related to deposit operations
+  version: 1.0.0
+
+tags:
+  - name: Loans
+    description: Endpoints related to deposit operations
+
+paths:
+  /api/deposits/deposit/{type}:
+    post:
+      tags:
+        - Deposits
+      summary: make a deposit
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [Saving, TaxSaving, ChildSavings, ForeignCurrency]
+          description: Type of  deposits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: string
+                  description: Account id to save money
+                amount:
+                  type: number
+                  format: float
+                  description: Amount of the deposit 
+                currency:
+                  type: string
+                  enum: [AMD, USD, RUB, EUR]
+                  description: Currency of the deposit
+              required:
+                - accountId
+                - amount
+                - currency
+      responses:
+        '200':
+          description: Successfully made deposit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Successfully made deposit
+        '400':
+          description: Bad request (e.g., invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Not implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+  /api/deposits:
+    get:
+      tags:
+        - Deposits
+      summary: Retrieve all deposits for a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: count
+          schema:
+            type: integer
+            format: int32
+          description: Number of loans to retrieve
+      responses:
+        '200':
+          description: Successfully retrieved depsoits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deposit'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Not implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Deposit:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '60d0fe4f5311236168a109ca'
+        userId:
+          type: string
+          example: '60d0fe4f5311236168a109cb'
+        depositType:
+          type: string
+          example: 'AutoLoan'
+        amount:
+          type: number
+          format: float
+          example: 10000.0
+        currency:
+          type: string
+          example: 'USD'
+        rate:
+          type: number
+          format: float
+          example: 12.12
+        accountId:
+          type: string
+          example: '11122jsdkkcehejdvshj1'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-07-15T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-07-15T12:00:00Z'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: 'An error occurred'

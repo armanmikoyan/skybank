@@ -1,6 +1,6 @@
-import { TransactionType, Status } from "../../interfaces/transactions/transactionInterface"; 
 import  mongoose  from "mongoose";
 import TransactionI from "../../interfaces/transactions/transactionInterface";
+import { TransactionType, Status } from "../../interfaces/transactions/transactionInterface"; 
 
 
 export default abstract class Transaction implements TransactionI {

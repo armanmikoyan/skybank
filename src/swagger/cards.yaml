@@ -76,6 +76,38 @@ paths:
         '501':
           description: Unexpected server error
 
+  /api/cards/changePin/{id}:
+    patch:
+      tags:
+        - Cards
+      summary: Change pin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the card to change the pin 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeCardPinRequest'
+      responses:
+        '201':
+          description: Card pin updated successfully
+        '404':
+          description: User not found / Card is not found
+        '409':
+          description: Incorrect pin
+        '500':
+          description: Internal server error
+        '501':
+          description: Unexpected server error
+
   /api/cards/deleteCard/{id}:
     delete:
       tags:
@@ -315,8 +347,6 @@ components:
     CreateCardRequest:
       type: object
       properties:
-        pin:
-          type: string
         cardType:
           type: string
         cardName:
@@ -380,6 +410,20 @@ components:
           type: string
           example: '1234'
       description: The PIN to authorize the change
+
+    ChangeCardPinRequest:
+      type: object
+      required:
+        - oldPin
+        - newPin
+      properties:
+        oldPin:
+          type: string
+          example: '1234'
+        newPin:
+          type: string
+          example: '1234'
+      description: The new Pin
 
     TransferToAccountRequestViaPhone:
       type: object

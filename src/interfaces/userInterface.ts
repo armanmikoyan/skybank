@@ -13,6 +13,8 @@ export interface UserInterface {
    birthDate: String,
    accounts: string[],
    cards: string[],
+   loans: string[],
+   deposits: string[],
    transactions: {
       transfers: string[],
       withdraws: string[],

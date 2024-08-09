@@ -14,7 +14,7 @@ class CardController {
 
    async createCard(req: Request, res: Response) { 
       try {
-         let { pin, cardType, cardName, accountId } = req.body;
+         let { cardType, cardName, accountId } = req.body;
         
          if (!accountId) {
             const defaultAccount: AcountPayloadFromUserInterface = {
@@ -27,7 +27,6 @@ class CardController {
          }
 
          const cardInfo: CardPayloadFromUserInterface = {
-            pin,
             cardType,
             cardName,
             accountId,
@@ -35,7 +34,7 @@ class CardController {
             userId: req.body.authorizedUser.id,
          };
          const card = await cardService.createCard(cardInfo);
-         res.status(201).json({ message: "Card created successfully", card });
+         res.status(201).json({ message: "Card created successfully. Pin sent to your email", card });
       } catch(error: any) {
          if (error instanceof UserNotFoundError || error instanceof AccountIsNotFound) {
             res.status(404).json({ error: error.message });
@@ -50,12 +49,31 @@ class CardController {
    }; 
     
    async changeCardName(req: Request, res: Response) {
-      const { authorizedUser: { id: userId }, pin } = req.body;
+      const { authorizedUser: { id: userId }} = req.body;
       const { id: cardId } = req.params;
       const { newCardName } = req.query;
       try {
-         await cardService.changeCardName(userId, cardId, newCardName as string, pin);
-         res.status(201).json({ message: "Card name changed successfully" });
+         const card = await cardService.changeCardName(userId, cardId, newCardName as string);
+         res.status(201).json(card);
+      } catch(error: any) {
+         if (error instanceof UserNotFoundError || error instanceof CardIsNotFound) {
+            res.status(404).json({ error: error.message });
+         } else if (error instanceof IncorrectPin) {
+            res.status(409).json({ error: error.message });
+         } else if (error instanceof InternalServerError) {
+            res.status(500).json({ error: error.message });
+         } else {
+            res.status(501).json({ error: error.message });
+         }
+      }  
+   };
+
+   async changePin(req: Request, res: Response) {
+      const { authorizedUser: { id: userId }, oldPin, newPin } = req.body;
+      const { id: cardId } = req.params;
+      try {
+         await cardService.changePin(userId, cardId, oldPin, newPin as string);
+         res.status(201).json({ message: "Pin has changed successfully" });
       } catch(error: any) {
          if (error instanceof UserNotFoundError || error instanceof CardIsNotFound) {
             res.status(404).json({ error: error.message });

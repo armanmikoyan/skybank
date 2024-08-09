@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { BaseValidator } from "./baseValidator";
-import CardCreateDto, { newCardNameValidator } from "../dto/card.dto"
+import CardCreateDto, { newCardNameValidator, newPinValidator } from "../dto/card.dto"
 
 class CardValidator extends BaseValidator {
    cardCreationMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -9,6 +9,10 @@ class CardValidator extends BaseValidator {
 
    cardChangeNameMiddleware(req: Request, res: Response, next: NextFunction) {
       return super.validate(newCardNameValidator, req.query, res, next);
+   }
+
+   cardChangePinMiddleware(req: Request, res: Response, next: NextFunction) {
+      return super.validate(newPinValidator, req.body, res, next);
    }
 }
 

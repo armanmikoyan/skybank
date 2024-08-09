@@ -279,6 +279,63 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+/api/accounts/transactions/transfer/viaQRCode:
+    post:
+      tags:
+        - Accounts
+      summary: Transfer money to another account via QR
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferToAccountRequest'
+      responses:
+        '200':
+          description: Transaction completed successfully
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/TransferToAccountResponse'
+        '400':
+          description: Not enough balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The same account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found / Account is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 /api/accounts:
     get:
       tags:

@@ -14,4 +14,5 @@ accountsRouter.delete("/deleteAccount/:id", authUserMiddleware, accountControlle
 accountsRouter.post("/transactions/transfer/account-to-account", authUserMiddleware, transferValidator.transferValidationMiddleware, accountController.transferToAccount)
 accountsRouter.post("/transactions/transfer/account-to-card", authUserMiddleware, transferValidator.transferValidationMiddleware, accountController.transferToCard);
 accountsRouter.post("/transactions/transfer/viaPhoneNumber", authUserMiddleware, transferValidator.transferValidationViaPhoneMiddleware, accountController.transferViaPhoneNumber);
+accountsRouter.post("/transactions/transfer/viaQRCode", authUserMiddleware, transferValidator.transferValidationMiddleware, accountController.transferToAccount)
 

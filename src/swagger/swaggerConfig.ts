@@ -30,6 +30,9 @@ const options = {
       path.join(__dirname, './cards.yaml'),
       path.join(__dirname, './accounts.yaml'),
       path.join(__dirname, './transactionHistory.yaml'),
+      path.join(__dirname, './general.yaml'),
+      path.join(__dirname, './loan.yaml'),
+      path.join(__dirname, './deposits.yaml'),
   ],
 };
 

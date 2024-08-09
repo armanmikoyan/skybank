@@ -1,0 +1,165 @@
+openapi: 3.0.0
+info:
+  title: Loans API Documentation
+  description: Endpoints related to loan operations
+  version: 1.0.0
+
+tags:
+  - name: Loans
+    description: Endpoints related to loan operations
+
+paths:
+  /api/loans/loan/{type}:
+    post:
+      tags:
+        - Loans
+      summary: Request a loan
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [AutoLoan, BusinessLoan, VacationLoan, StudentLoan]
+          description: Type of loan to request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  description: Amount of the loan requested
+                currency:
+                  type: string
+                  enum: [AMD, USD, RUB, EUR]
+                  description: Currency of the loan
+              required:
+                - amount
+                - currency
+      responses:
+        '200':
+          description: Successfully created the loan request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Request for a loan was sent"
+        '400':
+          description: Bad request (e.g., invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Not implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+  /api/loans:
+    get:
+      tags:
+        - Loans
+      summary: Retrieve all loans for a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: count
+          schema:
+            type: integer
+            format: int32
+          description: Number of loans to retrieve
+      responses:
+        '200':
+          description: Successfully retrieved loans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Loan'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Not implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Loan:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '60d0fe4f5311236168a109ca'
+        borrower:
+          type: string
+          example: '60d0fe4f5311236168a109cb'
+        loanType:
+          type: string
+          example: 'AutoLoan'
+        amount:
+          type: number
+          format: float
+          example: 10000.0
+        currency:
+          type: string
+          example: 'USD'
+        rate:
+          type: number
+          format: float
+          example: 12.12
+        status:
+          type: string
+          example: 'approved'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-07-15T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-07-15T12:00:00Z'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: 'An error occurred'

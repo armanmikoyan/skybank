@@ -38,25 +38,23 @@ class AccountService {
       }
    }
 
-   async changeAccountName(userId: string, accountId: string, password: string, newAccountName: string) {
+   async changeAccountName(userId: string, accountId: string, newAccountName: string) {
       try {
          const user = await userModel.findById(userId).lean();
          if (!user) throw new UserNotFoundError;
-         
-         const isCorrectPassword = await bcrypt.compare(password, user.password as string);
-         if (!isCorrectPassword) throw new IncorrectPasswordError;
-         
+            
          for (let i = 0; i < user.accounts.length; ++i) {
             if (user.accounts[i] == accountId) {
                const account = await accountModel.findById(accountId);
                if (!account) throw new AccountIsNotFound;
                account.accountName = newAccountName;
-               return await account.save();  
+               await account.save();  
+               return account;
             }
          }
          throw new AccountIsNotFound;
       } catch (error: any) {
-         if (error instanceof UserNotFoundError || error instanceof AccountIsNotFound || error instanceof IncorrectPasswordError) {
+         if (error instanceof UserNotFoundError || error instanceof AccountIsNotFound ) {
             throw error;
          } else {
             throw new InternalServerError(error.message);

@@ -16,8 +16,10 @@ class AuthController {
             lastName, 
             phone,  
             birthDate, 
-            accounts:[], 
-            cards:[],  
+            accounts: [], 
+            cards: [],  
+            loans: [],
+            deposits: [],
             transactions: {
                transfers: [],
                withdraws: [] 

@@ -42,7 +42,19 @@ const userSchema: Schema<UserInterface> = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Card",
       },
-   ],
+    ],
+    loans: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Loan",
+      }
+    ],
+    deposits: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Deposit",
+      }
+    ],
    transactions: {
       transfers: [
         {

@@ -9,6 +9,7 @@ export const cardsRouter = Router();
 cardsRouter.get("/", authUserMiddleware, cardController.getCards);
 cardsRouter.post("/createCard", authUserMiddleware, cardValidator.cardCreationMiddleware, cardController.createCard);
 cardsRouter.patch("/changeCardName/:id", authUserMiddleware, cardValidator.cardChangeNameMiddleware, cardController.changeCardName);
+cardsRouter.patch("/changePin/:id", authUserMiddleware, cardValidator.cardChangePinMiddleware, cardController.changePin);
 cardsRouter.delete("/deleteCard/:id", authUserMiddleware, cardController.deleteCard);
 
 cardsRouter.post("/transactions/transfer/card-to-account", authUserMiddleware, transferValidator.transferValidationMiddleware, cardController.transferToAccount)

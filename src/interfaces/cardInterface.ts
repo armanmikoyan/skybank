@@ -8,13 +8,13 @@ export interface CardPayloadFromSystemInterface {  // It'll be added from system
    expirationDate: Date,
    cvv: string,
    currency: string;
+   pin: string,
 };
 
 export interface CardPayloadFromUserInterface {  // It'll be added from user
    userId: string,
    accountId: string,
    cardHolderName: string,
-   pin: string,
    cardType: string,
    cardName: string | undefined,
 };

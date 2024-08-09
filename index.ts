@@ -8,6 +8,9 @@ import { authRouter } from "./src/routes/authRouter";
 import { cardsRouter } from "./src/routes/cardsRouter";
 import { accountsRouter } from "./src/routes/accountsRouter";
 import { historyRouter } from "./src/routes/historyRouter";
+import { loanRouter } from "./src/routes/loanRouter";
+import { generalRouter } from "./src/routes/generalRouter";
+import { depositRouter } from "./src/routes/depositRouter";
 import { mongoDbStart } from "./src/dataBase/mongo";
 
 const PORT = process.env.PORT || 6666;
@@ -24,6 +27,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/cards", cardsRouter);
 app.use("/api/accounts", accountsRouter);
 app.use("/api/history", historyRouter);
+app.use("/api/general", generalRouter);
+app.use("/api/loans", loanRouter);
+app.use("/api/deposits", depositRouter);
 
 app.listen(PORT, () => {
    console.log(`Server is running on Port ${PORT}`);

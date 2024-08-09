@@ -1,0 +1,98 @@
+openapi: 3.0.0
+info:
+  title: General API Documentation
+  description: Endpoints related to general bank information
+  version: 1.0.0
+
+tags:
+  - name: General
+    description: Endpoints related to  general bank information
+
+paths:
+  /api/general/allCurrencies:
+    get:
+      tags:
+        - General
+      summary: Get all currencies
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllCurrenciesResponse'
+        '401':
+          description: Unauthorized request
+
+  /api/general/allLoanTypes:
+    get:
+      tags:
+        - General
+      summary: Get all loans
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllLoansResponse'
+        '401':
+          description: Unauthorized request       
+
+  /api/general/allDepositTypes:
+    get:
+      tags:
+        - General
+      summary: Get all deposit types
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllDepositResponse'
+        '401':
+          description: Unauthorized request       
+
+components:
+  schemas:
+  
+    AllCurrenciesResponse:
+      type: object
+      additionalProperties:
+        type: string
+      example: 
+        AMD: "AMD"
+        EUR: "EUR"
+        USD: "USD"
+        RUB: "RUB"
+
+    AllLoansResponse:
+      type: object
+      additionalProperties:
+        type: string
+      example: 
+        StudentLoan: StudentLoan
+        AutoLoan: AutoLoan
+        BusinessLoan: BusinessLoan
+        VacationLoan: VacationLoan
+
+    AllDepositResponse:
+      type: object
+      additionalProperties:
+        type: string
+      example: 
+        Saving: Saving
+        TaxSaving: TaxSaving
+        ChildSavings: ChildSavings
+        ForeignCurrency: ForeignCurrency
+
+
+
+        

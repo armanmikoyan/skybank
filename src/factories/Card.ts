@@ -15,14 +15,14 @@ export default class Card implements CardInterface {
    balance: number;
    
 
-   constructor(userId: string, accountId: string, cardHolderName: string, pin: string, cardType: string, cardName: string | undefined, currency: Currency) {
+   constructor(userId: string, accountId: string, cardHolderName: string, cardType: string, cardName: string | undefined, currency: Currency) {
       this.cardNumber = this.#generateCardNumber();
       this.expirationDate = this.#generateExpirationDate();
       this.cvv = this.#generateCvv();
+      this.pin = this.#generatePin();
       this.userId = userId;
       this.accountId = accountId;
       this.cardHolderName = cardHolderName;
-      this.pin = pin;
       this.cardType = cardType;
       this.cardName = cardName;
       this.currency = currency
@@ -56,4 +56,8 @@ export default class Card implements CardInterface {
       const cvv = Math.floor(100 + Math.random() * 900).toString();
       return cvv;
    };
+
+   #generatePin(): string {
+      return Math.floor(1000 + Math.random()*9000).toString();
+    }
 };

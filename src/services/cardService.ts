@@ -12,13 +12,14 @@ import { CardIsNotFound, UserNotFoundError, IncorrectPin, IncorrectPasswordError
 import { AccountIsNotFound, AccountIsBusy } from "../errors/authErrors";
 import { NotEnoughBalance, TheSameAccountNumber, } from "../errors/transactionErrors";
 import { Currency } from "../interfaces/transactions/transactionInterface"
+import { transporter } from "../utils/transportEmail"
 
 
  
 class CardService {
 
    async createCard(cardPayloadFromUser: CardPayloadFromUserInterface) {
-      const { userId, accountId, cardHolderName, pin, cardType, cardName } = cardPayloadFromUser;   
+      const { userId, accountId, cardHolderName, cardType, cardName } = cardPayloadFromUser;   
       try {
          const user = await userSchema.findById(userId);
          if (!user) throw UserNotFoundError;   
@@ -32,9 +33,11 @@ class CardService {
          if (account.hasCard) throw new AccountIsBusy; 
 
          const currency: Currency = account.currency as Currency;
-         const hashedPin = await bcrypt.hash(pin, 10);
-         const card = new Card(userId, accountId, cardHolderName, hashedPin, cardType, cardName, currency);  
+         const card = new Card(userId, accountId, cardHolderName, cardType, cardName, currency);  
          card.balance = account.balance;
+
+         await this.sendPin(user.email, card.pin);
+         card.pin = await bcrypt.hash(card.pin, 10);
          card.cvv = await bcrypt.hash(card.cvv, 10);
          const storedCard = await cardSchema.create(card);
    
@@ -58,7 +61,7 @@ class CardService {
       }    
    }; 
 
-   async changeCardName(userId: string, cardId: string, newCardName: string, pin: string) {
+   async changeCardName(userId: string, cardId: string, newCardName: string) {
       try {
          const user = await userSchema.findById(userId).lean();
          if (!user) throw new UserNotFoundError;
@@ -68,10 +71,35 @@ class CardService {
                const card = await cardSchema.findById(cardId);
                if (!card) throw new CardIsNotFound;
 
-               const isCorrectPin = await bcrypt.compare(pin, card.pin as string);
-               if (!isCorrectPin) throw new IncorrectPin;
-
                card.cardName = newCardName;
+               await card.save();  
+               return card;
+            }
+         }
+         throw new CardIsNotFound;
+      } catch(error: any) {
+         if (error instanceof UserNotFoundError || error instanceof CardIsNotFound) {
+            throw error;
+         } else {
+            throw new InternalServerError(error.message);
+         }
+      }
+   };
+
+   async changePin(userId: string, cardId: string, oldPin: string, newPin: string) {
+      try {
+         const user = await userSchema.findById(userId).lean();
+         if (!user) throw new UserNotFoundError;
+    
+         for (let i = 0; i < user.cards.length; ++i) {
+            if (user.cards[i] == cardId) {
+               const card = await cardSchema.findById(cardId);
+               if (!card) throw new CardIsNotFound;
+
+               const isCorrectPin = await bcrypt.compare(oldPin, card.pin as string);
+               if (!isCorrectPin) throw new IncorrectPin;
+               const hashedPin = await bcrypt.hash(newPin, 10);
+               card.pin = hashedPin;
                return await card.save();  
             }
          }
@@ -210,12 +238,37 @@ class CardService {
          for (const cardId of cardIds) {
             cards.push(await cardModel.findById(cardId) as CardInterface);
          };
-         
         return cards;
-
       } catch(error: any) {
          throw error;
       }
+   }
+
+   private async sendPin(who: string, code: string) {
+      const htmlContent = `
+      <a style="
+          display: inline-block; 
+          padding: 10px 20px; 
+          margin: 10px 0; 
+          font-size: 16px; 
+          color: #ffffff; 
+          background-color: #007bff; 
+          text-decoration: none; 
+          border-radius: 5px;
+          border: 1px solid #007bff;
+          transition: background-color 0.3s ease;
+      " 
+      href="#">
+        ${code}
+      </a>`;
+    
+      const mailOptions = {
+         from: process.env.EMAIL_USER,
+         to: who, 
+         subject: "Your card pin",
+         html: htmlContent,
+      };
+      transporter.sendMail(mailOptions);
    }
 };
 

@@ -7,7 +7,7 @@ import { AccountIsNotFound, UserNotFoundError, IncorrectPasswordError, CardIsNot
 import { AcountPayloadFromUserInterface } from "../interfaces/accountInterface"
 import { NotEnoughBalance, TheSameAccountNumber, } from "../errors/transactionErrors";
 
-class accountController {
+class AccountController {
 
    async createAccount(req: Request, res: Response) {
       try {
@@ -32,12 +32,12 @@ class accountController {
    }
 
    async changeAccountName(req: Request, res: Response) {
-      const { authorizedUser: { id: userId }, password } = req.body;
+      const { authorizedUser: { id: userId } } = req.body;
       const { id: accountId } = req.params;
       const { newAccountName } = req.query;
       try {
-         await accountsService.changeAccountName(userId, accountId, password, newAccountName as string);
-         res.status(201).json({ message: "Account name changed successfully" });
+         const account = await accountsService.changeAccountName(userId, accountId, newAccountName as string);
+         res.status(201).json(account);
       } catch(error: any) {
          if (error instanceof UserNotFoundError || error instanceof AccountIsNotFound) {
             res.status(404).json({ error: error.message });
@@ -176,4 +176,4 @@ class accountController {
 
 };
 
-export default new accountController;
+export default new AccountController;
